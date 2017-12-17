@@ -47,19 +47,21 @@ def hr_predict(unit_id, amount):
     while limit <= amount:
         akhir = HeartRate.objects.filter(unit_id=unit_id).aggregate(Max('timestamp'))
         akhir = akhir['timestamp__max']
-        awal -= timedelta(hours=1)
+        awal = akhir - timedelta(minutes=amount)
+        hr_count = 0
         count = 0
         while awal <= akhir:
-            hr = HeartRate.objects.get(timestamp=awal)
-            hr_count += hr  
+            try:
+                hr = HeartRate.objects.get(timestamp=awal)
+                hr_count += hr.heart_rate  
+                count += 1
+            except:
+                pass
             awal += timedelta(minutes=1)
-            count += 1
         hr_avg = round(hr_count / count) 
         hr = HeartRate.objects.create(unit_id=unit_id, heart_rate=hr_avg, timestamp=(akhir + timedelta(minutes=1)), sync_time=timezone.now())
         limit += 1
-        print(limit)
-        print(hr.heart_rate)
-    
+    print("Heart rate prediction success")    
 
 def hr_status(unit_id):
     awal = HeartRate.objects.filter(unit_id=unit_id).aggregate(Min('timestamp'))
@@ -67,17 +69,19 @@ def hr_status(unit_id):
     akhir = HeartRate.objects.filter(unit_id=unit_id).aggregate(Max('timestamp'))
     akhir = akhir['timestamp__max']
     while awal <= akhir:
-        hr = HeartRate.objects.get(timestamp=awal)
-        if hr.heart_rate <= 80 and hr.heart_rate >= 60:
-            hr.status = "Normal"
-        elif hr.heart_rate < 60:
-            hr.status = "Bradycardia"
-        else:
-            hr.status = "Thacycardia"
-        hr.save  
+        try:
+            hr = HeartRate.objects.get(timestamp=awal)
+            if hr.heart_rate <= 80 and hr.heart_rate >= 60:
+                hr.status = "Normal"
+            elif hr.heart_rate < 60:
+                hr.status = "Bradycardia"
+            else:
+                hr.status = "Thacycardia"
+            hr.save()  
+        except:
+            pass
         awal += timedelta(minutes=1)
-        print(awal)
-        print(hr.status)
+    print("Heart rate status success")
 
 
 
