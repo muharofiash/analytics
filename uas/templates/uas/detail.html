@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Detail</title>
+
+    <!--Load the AJAX API-->
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+
+    google.charts.load('current', {packages: ['corechart', 'line']});
+    google.charts.setOnLoadCallback(drawBasic);
+    google.charts.setOnLoadCallback(drawTrendlines);
+
+    function drawBasic() {
+
+        var data = new google.visualization.DataTable();
+        data.addColumn('number', 'X');
+        data.addColumn('number', 'Value');
+        
+        data.addRows(
+            {{ chart|safe }}
+        );
+
+        var options = {
+            'title':'Plotting Data',
+                     'height':500,
+            hAxis: {
+            title: 'Time'
+            },
+            vAxis: {
+            title: 'Heart Rate'
+            },
+            trendlines: {
+            0: {type: 'exponential', color: '#333', opacity: 1.3}
+            }
+        };
+
+        var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
+
+        chart.draw(data, options);
+        }
+    </script>
+</head>
+
+<body>
+<table align="center" style="width:40%">
+        <caption style="font-size:40px">Detail</caption>
+        <tr>
+          <th>Parameter</th>
+          <th>Values</th>
+        </tr>
+        <tr>
+          <td>Unit id</td>
+          <td>{{ unit_id }}</td>
+        </tr>
+        <tr>
+          <td>Heart Rate Minimum</td>
+          <td>{{ hr_min }}</td>
+        </tr>
+        <tr>
+          <td>Heart Rate Average</td>
+          <td>{{ hr_avg }}</td>
+        </tr>
+        <tr>
+          <td>Heart Rate Maximum</td>
+          <td>{{ hr_max }}</td>
+        </tr>
+        <tr>
+          <td>Heart Rate Median</td>
+          <td>{{ hr_median }}</td>
+        </tr>
+        <tr>
+          <td>Heart Rate Mode</td>
+          <td>{{ hr_mode }}</td>
+        </tr>
+        <tr>
+          <td>Heart Rate Standard Deviation</td>
+          <td>{{ hr_stdev }}</td>
+        </tr>
+        <tr>
+          <td>Heart Rate Variance</td>
+          <td>{{ hr_var }}</td>
+        </tr>
+      </table> 
+
+    <!--Div that will hold the pie chart-->
+    <div id="chart_div"></div>
+    
+</body>
+</html>
